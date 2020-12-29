@@ -1,0 +1,31 @@
+
+version: '3'
+
+services:
+  sqlite3:
+    build:
+      context: ./
+      dockerfile: sqlite.Dockerfile
+    image: sqlite3/latest
+    stdin_open: true
+    tty: true
+    volumes:
+      - db_data:/root/db/
+
+  deno:
+    depends_on:
+      - sqlite3
+    build:
+      context: ./
+      dockerfile: deno.Dockerfile
+    image: deno/latest
+    ports:
+      - "8000:8000"
+    restart: always
+    volumes:
+      - db_data:/app/db
+    environment:
+      DB_PATH: /app/db/deno-sqlite.db
+
+volumes:
+    db_data: {}
